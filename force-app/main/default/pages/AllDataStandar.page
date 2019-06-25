@@ -1,0 +1,42 @@
+<apex:page standardController="Student__c" recordSetVar="students" extensions="pagination">
+    <apex:pageBlock title="Students List" id="studentList">
+        <apex:form >
+            <apex:commandButton action="insert" value="New"/>
+        </apex:form>
+        <apex:pageBlockTable value="{! students }" var="st">
+            
+            <apex:column value="{! st.Id }"/>
+            <apex:column value="{! st.IdStudent__c }"/>
+            <apex:column value="{! st.Full_Name_Student__c }"/>
+            <apex:column value="{! st.Birth_Born__c }"/>
+            <apex:column value="{! st.Email__c }"/>
+            <apex:column value="{! st.School__r.Name}"/>
+            <apex:column value="{! st.Teacher__r.Full_Name_Teacher__c}"/>
+            <apex:column >
+                <apex:form >
+                    <apex:outputLink value="{! URLFOR($Action.Student__c.Edit, st.Id) }">Edit </apex:outputLink>
+                    <span></span>
+                    <apex:outputLink value="{! URLFOR($Action.Student__c.Delete, st.Id) }"> Delete</apex:outputLink>
+                </apex:form>
+             </apex:column>
+            
+        </apex:pageBlockTable>
+    </apex:pageBlock>
+    
+    <apex:form >
+        <table style="width: 100%">
+            <tr>
+                <td align="left">
+                    Page: 
+                    <apex:outputText value=" {!PageNumber} of {! CEILING(ResultSize / PageSize) }"/>
+                </td>
+                <td align="center">
+                    <apex:commandLink action="{! Previous }" value="« Previous " rendered="{! HasPrevious }"/>
+                    <apex:outputText style="color: #ccc;" value="« Previous " rendered="{! NOT(HasPrevious) }"/>   
+                    <apex:commandLink action="{! Next }" value=" Next »" rendered="{! HasNext }"/> 
+                    <apex:outputText style="color: #ccc;" value=" Next »" rendered="{! NOT(HasNext) }"/>
+            	</td>
+        	</tr>
+    	</table>
+    </apex:form>
+</apex:page>
