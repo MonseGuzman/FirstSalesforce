@@ -1,13 +1,9 @@
 <apex:page controller="AllDataController">
-
-    <apex:form >
-        <apex:inputText value="{! name}" />
-        <apex:commandButton action="" value="Search" reRender=""/>
-    </apex:form>
+    
     <!-- Add a New Student -->
      <apex:pageBlock title="NEW">
-        <apex:pageMessages id="errorAddStudent" />
-        <apex:pageBlockSection title="Add a student">
+         <apex:pageMessages id="errorAddStudent" />
+         <apex:pageBlockSection title="Add a student">
             <apex:form >
                 <table style="width: 100%">
                     <tr>
@@ -34,28 +30,62 @@
                     </tr>
                     <tr>
                         <td>
-                            <apex:outputText >School</apex:outputText>
+                            <apex:outputText >School: </apex:outputText>
                 			<apex:inputField value="{! student.School__C }" />
                         </td>
                         <td>
-                            <apex:outputText >Teacher</apex:outputText>
+                            <apex:outputText >Teacher: </apex:outputText>
                 			<apex:inputField value="{! student.Teacher__C }" />
                         </td>
                     </tr>
                 </table>
-                
-                <apex:commandButton value="Save" action="{!addNewStudent}" reRender="errorAddStudent" />
-               
+                <apex:commandButton value="Save" action="{!addNewStudent}" reRender="errorAddStudent"/>
             </apex:form> 
-            
         </apex:pageBlockSection>
     </apex:pageBlock>
+    <!-- SEARCH -->
+    <apex:form >
+        <apex:pageMessages id="errorSearchStudent" />
+        <apex:outputText >Search a student: </apex:outputText>
+        <apex:inputField id="searchStudent" value="{!student2.Name}" />
+        <apex:commandButton value="Search" action="{!dataForNameSt}" reRender="listSearchSt"  />
+        
+        <apex:actionFunction name="myFunc" action="{!dataForNameSt}" reRender="errorSearchStudent">
+            <apex:param name="searchSt" value="" assignTo="{!student2}" />
+        </apex:actionFunction>
+    </apex:form>
+    <apex:form >
+        <apex:pageBlock title="Search by student name" id="listSearchSt">
+            <apex:pageMessages id="errorDeleteStudent" />
+            <apex:pageBlockTable value="{! searchList }" var="ss">
+                
+                <apex:column value="{! ss.IdStudent__c }"/>
+                <apex:column value="{! ss.Full_Name_Student__c }"/>
+                <apex:column value="{! ss.Birth_Born__c }"/>
+                <apex:column value="{! ss.Email__c }"/>
+                <apex:column value="{! ss.School__r.Name}"/>
+                <apex:column value="{! ss.Teacher__r.Full_Name_Teacher__c}"/>
+                
+                <apex:column >
+                    <apex:commandLink value="Edit" action="{!showPopup}" reRender="tstpopup">
+                         <apex:param name="buttonEditS" value="{!ss.Id}" assignTo="{!idUpdateStudent}" />
+                    </apex:commandLink>
+                    
+                </apex:column>
+                <apex:column >
+                    <apex:commandLink value="Delete" action="{!deleteStudent}" reRender="listStudents, errorDeleteStudent">
+                        <apex:param name="buttonDeleteS" value="{!ss.Id}" assignTo="{!idDeleteStudent}"/>
+                    </apex:commandLink>
+                </apex:column>
+                
+            </apex:pageBlockTable>
+        </apex:pageBlock>
+    </apex:form>
     <!-- Datos -->
     <apex:form >
-        
         <apex:pageBlock title="Student List" id="listStudents">
+            <apex:pageMessages id="errorDeleteStudent" />
             <apex:pageBlockTable value="{! queryStudents }" var="sc">
-                <apex:pageMessages id="errorDeleteStudent" />
                 
                 <apex:column value="{! sc.IdStudent__c }"/>
                 <apex:column value="{! sc.Full_Name_Student__c }"/>
@@ -65,19 +95,19 @@
                 <apex:column value="{! sc.Teacher__r.Full_Name_Teacher__c}"/>
                 
                 <apex:column >
-                    <apex:commandLink value="Edit" action="{!showPopup}" reRender="tstpopup">
+                    <apex:commandLink value="Edit" action="{!updateStudent}" reRender="tstpopup">
                          <apex:param name="buttonEditS" value="{!sc.Id}" assignTo="{!idUpdateStudent}" />
                     </apex:commandLink>
                     
                 </apex:column>
                 <apex:column >
-                    <apex:commandLink value="Delete" action="{!deleteStudent}" reRender="errorDeleteStudent" reRender="errorDeleteStudent">
+                    <apex:commandLink value="Delete" action="{!deleteStudent}" reRender="listStudents, errorDeleteStudent">
                         <apex:param name="buttonDeleteS" value="{!sc.Id}" assignTo="{!idDeleteStudent}"/>
                     </apex:commandLink>
                 </apex:column>
                 
             </apex:pageBlockTable>
-        </apex:pageBlock>    
+        </apex:pageBlock>
     </apex:form>
     <!-- Pagination -->
     <apex:form >
@@ -99,40 +129,36 @@
                     <apex:pageBlockTable value="{! dataRecord }" var="up">
                         
                         <apex:column >
-                            <apex:outputText >Name Student: </apex:outputText>
-                            <apex:outputText >Last Name Student: </apex:outputText> <br/>
+                            <apex:outputText >Name Student: </apex:outputText><br/>
+                            <apex:outputText >Last Name: </apex:outputText> <br/>
                             <apex:outputText >Email: </apex:outputText> <br/>
                             <apex:outputText >Birth Both: </apex:outputText> <br/>
                             <apex:outputText >Active: </apex:outputText> <br/>
                         </apex:column>
-                
+                                        
                         <apex:column >
-                            <apex:inputText value="{!name}" />
-                            <apex:inputText value="{!lastname}" />
-                            <apex:inputText value="{!email}" />
-                            <apex:inputText value="{!birthBorn}" />
-                            <apex:inputText value="{!activeStudent}" />
+                            <apex:inputField value="{!student3.Name}" />
+                            <apex:inputField value="{!student3.Last_Name__c}" />
+                            <apex:inputField value="{!student3.Email__c}" />
+                            <apex:inputField value="{!student3.Birth_Born__c}" />
+                            <apex:inputField value="{!student3.Active_Student__c}" />
                         </apex:column>
-                        
-                        
-                        <!-- <apex:column >
-                            <apex:outputText >Last: {!up.Name} </apex:outputText> 
-                            <apex:outputText >Last: {!up.Last_Name__c} </apex:outputText> <br/>
-                            <apex:outputText >Last: {!up.Email__c} </apex:outputText> <br/>
-                            <apex:outputText >Last: {!up.Birth_Born__c} </apex:outputText> <br/>
-                            <apex:outputText >Last: {!up.Active_Student__c} </apex:outputText> <br/>
-                        </apex:column> -->
                         
                     </apex:pageBlockTable>
                 </apex:pageBlock>
-                <apex:commandButton value="Save" action="{! updateStudent }" />
+                <apex:commandButton value="Save" action="{! updateStudentButton }" />
+                
+                <apex:actionFunction name="myFunc2s" action="{!updateStudent}" reRender="listSearchSt">
+                    <apex:param name="editSt" value="" assignTo="{!student3}" />
+                </apex:actionFunction>
+                
                 <apex:commandButton value="Close" action="{!closePopup}" rerender="tstpopup"/>
             </apex:outputPanel>
         </apex:outputPanel>
     </apex:form>
- 
+    
     <!--Add a new teacher -->
-     <apex:pageBlock title="NEW">
+    <apex:pageBlock title="NEW">
         <apex:pageMessages id="errorAddTeacher" />
         <apex:pageBlockSection title="Add a teacher">
             <apex:form >
@@ -164,11 +190,46 @@
             
         </apex:pageBlockSection>
     </apex:pageBlock>
+     <!-- SEARCH -->
+    <apex:form >
+        <apex:pageMessages id="errorEditTeacher" />
+        <apex:outputText >Search a teacher: </apex:outputText>
+        <apex:inputField id="searchTeacher" value="{!teacher2.Name}" />
+        <apex:commandButton value="Search" action="{!dataForNameTea}" />
+        
+        <apex:actionFunction name="myFuncTeacher" action="{!dataForNameTea}" reRender="listSearchTeacher">
+            <apex:param name="searchSt" value="" assignTo="{!teacher2}" />
+        </apex:actionFunction>
+    </apex:form>
+    <apex:form >
+        <apex:pageBlock title="Teacher List" id="listSearchTeacher" rendered="{!showSaveT}">
+            <apex:pageMessages id="errorDeleteTeacher" />
+            <apex:pageBlockTable value="{! searchTeacherList }" var="stc">
+                
+                <apex:column value="{! stc.Full_Name_Teacher__c }"/>
+                <apex:column value="{! stc.Email_Work__c }"/>
+                <apex:column value="{! stc.Number_Students__c }"/>
+                <apex:column value="{! stc.School_Work__r.Name }"/>
+                
+                <apex:column >
+                    <apex:commandLink value="Edit" action="{!showPopupT}" reRender="tstpopupT">
+                        <apex:param name="newTeacherEdit" value="{!stc.Id}" assignTo="{!idTeacherUpdate}"/>
+                    </apex:commandLink>
+                </apex:column>
+                <apex:column >
+                    <apex:commandLink value="Delete" action="{! deleteRecordTeacher }" reRender="listTeacher, errorDeleteTeacher">
+                        <apex:param name="newTeacherDelete" value="{!stc.Id}" assignTo="{!idTeacherDelete}"/>
+                    </apex:commandLink>
+                </apex:column>
+                
+            </apex:pageBlockTable>
+        </apex:pageBlock>    
+    </apex:form>
      <!-- Datos -->
     <apex:form >
-        <apex:pageBlock title="Teacher List" id="listTeacher">
+        <apex:pageBlock title="Teacher List" id="listTeacher" >
+            <apex:pageMessages id="errorDeleteTeacher" />
             <apex:pageBlockTable value="{! queryTeacher }" var="tc">
-                <apex:pageMessages id="errorDeleteTeacher" />
                 
                 <apex:column value="{! tc.Full_Name_Teacher__c }"/>
                 <apex:column value="{! tc.Email_Work__c }"/>
@@ -176,14 +237,14 @@
                 <apex:column value="{! tc.School_Work__r.Name }"/>
                 
                 <apex:column >
-                    <apex:commandButton value="Edit" action="{!showPopupT}" reRender="tstpopupT">
+                    <apex:commandLink value="Edit" action="{!showPopupT}" reRender="tstpopupT">
                         <apex:param name="newTeacherEdit" value="{!tc.Id}" assignTo="{!idTeacherUpdate}"/>
-                    </apex:commandButton>
+                    </apex:commandLink>
                 </apex:column>
                 <apex:column >
-                    <apex:commandButton value="Delete" action="{! deleteRecordTeacher }" reRender="listTeacher" reRender="errorDeleteTeacher">
+                    <apex:commandLink value="Delete" action="{! deleteRecordTeacher }" reRender="listTeacher, errorDeleteTeacher">
                         <apex:param name="newTeacherDelete" value="{!tc.Id}" assignTo="{!idTeacherDelete}"/>
-                    </apex:commandButton>
+                    </apex:commandLink>
                 </apex:column>
                 
             </apex:pageBlockTable>
@@ -199,11 +260,11 @@
             	</td>
         	</tr>
     	</table>
-    </apex:form> 
+    </apex:form>
     <!-- MODAL  -->
     <apex:form > 
         <apex:outputPanel id="tstpopupT">
-            <apex:outputPanel styleClass="popupBackground" layout="block" rendered="{!displayPopUpT}"/>
+            <apex:outputPanel styleClass="popupBackground" layout="block" />
             <apex:outputPanel styleClass="custPopup" layout="block" rendered="{!displayPopUpT}">
                 <apex:pageBlock title="Edit Teacher">
                     <apex:pageBlockTable value="{! dataRecordTeacher }" var="upt">
@@ -216,12 +277,10 @@
                         </apex:column>
                 
                         <apex:column >
-                            <apex:inputField value="{! upt.Name }">
-                                <apex:param value="{! upt.Name }" assignTo="{! name }"/>
-                            </apex:inputField>
-                            <apex:inputField value="{! upt.Last_Name__c }" />
-                            <apex:inputField value="{! upt.Email_Work__c }" />
-                            <apex:inputField value="{! upt.School_Work__c }" />
+                            <apex:inputField value="{! teacher3.Name }" />
+                            <apex:inputField value="{! teacher3.Last_Name__c }" />
+                            <apex:inputField value="{! teacher3.Email_Work__c }" />
+                            <apex:inputField value="{! teacher3.School_Work__c }" />
                         </apex:column>
                         
                     </apex:pageBlockTable>
@@ -236,7 +295,7 @@
     <apex:pageBlock title="NEW">
         <apex:pageBlockSection title="Add a School">
             <apex:form >
-                <table style="width: 100%">
+                <table id="showSchool" style="width: 100%">
                     <tr>
                         <td>
                             <apex:outputText >Name School: </apex:outputText> <br/>
@@ -249,16 +308,53 @@
                     </tr>
                 </table>
                 
-                <apex:commandButton value="Save" action="{!addNewSchool}" />
+                <apex:commandButton value="Save" action="{!addNewSchool}" disabled="{!showSaveS}" />
             </apex:form> 
             
         </apex:pageBlockSection>
     </apex:pageBlock>
+    <!-- SEARCH -->
+    <apex:form >
+        <apex:pageMessages id="errorSearchSchool" />
+        <apex:outputText >Search a school: </apex:outputText>
+        <apex:inputField id="searchSchoolr" value="{!school2.Name}" />
+        <apex:commandButton value="Search" action="{!dataForNameSc}" reRender="errorSearchSchool"/>
+        
+        <apex:actionFunction name="myFuncSch" action="{!dataForNameSc}" reRender="searchSchoolr">
+            <apex:param name="searchS" value="" assignTo="{!school2}" />
+        </apex:actionFunction>
+    </apex:form>
+    <apex:form >
+        <apex:pageBlock title="School List" id="listSearchSchool" rendered="{!showSaveS}">
+            <apex:pageMessages id="errorDeleteSchool" />
+            <apex:pageBlockTable value="{! searchSchoolList }" var="ssh">
+                
+                <apex:column value="{! ssh.Code_School__c }"/>
+                <apex:column value="{! ssh.Name }"/>
+                <apex:column value="{! ssh.Phone_School__c }"/>
+                <apex:column value="{! ssh.Number_Teachers__c }"/>
+                <apex:column value="{! ssh.Number_Students__c }"/>
+                <apex:column value="{! ssh.Restantes__c }"/>
+                
+                <apex:column >
+                    <apex:commandLink value="Edit" action="{!showPopupS}" reRender="tstpopupS">
+                        <apex:param name="newSchoolEdit" value="{!ssh.Id}" assignTo="{!schoolIdUpdate}"/>
+                    </apex:commandLink>
+                </apex:column>
+                <apex:column >
+                    <apex:commandLink value="Delete" action="{! deleteRecordSchool }" reRender="listSchool, errorDeleteSchool">
+                        <apex:param name="newSchoolDelete" value="{!ssh.Id}" assignTo="{!schoolIdDelete}"/>
+                    </apex:commandLink>
+                </apex:column>
+                
+            </apex:pageBlockTable>
+        </apex:pageBlock>    
+    </apex:form>
      <!-- Datos  -->
     <apex:form >
-        <apex:pageBlock title="School List" id="listSchool">
+        <apex:pageBlock title="School List" id="listSchool" rendered="{!showSaveS2}">
+            <apex:pageMessages id="errorDeleteSchool" />
             <apex:pageBlockTable value="{! querySchool }" var="sh">
-                <apex:pageMessages id="errorDeleteSchool" />
                 
                 <apex:column value="{! sh.Code_School__c }"/>
                 <apex:column value="{! sh.Name }"/>
@@ -268,14 +364,14 @@
                 <apex:column value="{! sh.Restantes__c }"/>
                 
                 <apex:column >
-                    <apex:commandButton value="Edit" action="{!showPopupS}" reRender="tstpopupS">
+                    <apex:commandLink value="Edit" action="{!showPopupS}" reRender="tstpopupS">
                         <apex:param name="newSchoolEdit" value="{!sh.Id}" assignTo="{!schoolIdUpdate}"/>
-                    </apex:commandButton>
+                    </apex:commandLink>
                 </apex:column>
                 <apex:column >
-                    <apex:commandButton value="Delete" action="{! deleteRecordSchool }" reRender="listSchool" reRender="errorDeleteSchool">
+                    <apex:commandLink value="Delete" action="{! deleteRecordSchool }" reRender="listSchool, errorDeleteSchool">
                         <apex:param name="newSchoolDelete" value="{!sh.Id}" assignTo="{!schoolIdDelete}"/>
-                    </apex:commandButton>
+                    </apex:commandLink>
                 </apex:column>
                 
             </apex:pageBlockTable>
@@ -292,7 +388,7 @@
         	</tr>
     	</table>
     </apex:form> 
-    <!-- MODAL EDIT -->
+    <!-- MODAL -->
     <apex:form > 
         <apex:outputPanel id="tstpopupS">
             <apex:outputPanel styleClass="popupBackground" layout="block" rendered="{!displayPopUpS}"/>
@@ -318,7 +414,7 @@
                 <apex:commandButton value="Close" action="{!closePopupS}" rerender="tstpopupS"/>
             </apex:outputPanel>
         </apex:outputPanel>
-    </apex:form>
+    </apex:form>    
     
     <style type="text/css">
         .custPopup{

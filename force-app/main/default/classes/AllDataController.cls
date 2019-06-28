@@ -12,15 +12,23 @@ public class AllDataController {
     public String idUpdateStudent {get; set;}
     public boolean displayPopup {get; set;}
     public Student__c student {get; set;}
+    public Student__c student2 {get; set;}
+    public Student__c student3 {get; set;}
+    public List<Student__c> searchList {get; set;}
     
-    public boolean activeStudent {get; set;}
-    public String name {get; set;}
-    public String lastName {get; set;}
-    public Date birthBorn {get; set;}
-    public String email {get; set;}
+    public boolean showSave {get; set;}
+    public boolean showSaveT {get; set;}
+    public boolean showSaveS {get; set;}
     
+    public boolean showSave2 {get; set;}
+    public boolean showSaveT2 {get; set;}
+    public boolean showSaveS2 {get; set;}
+        
     //TEACHER VARIABLES
     public Teacher__c teacher {get; set;}
+    public Teacher__c teacher2 {get; set;}
+    public Teacher__c teacher3 {get; set;}
+    public List<Teacher__c> searchTeacherList {get; set;}
     public String idTeacherUpdate {get; set;}
     public String idTeacherDelete {get; set;}
     public boolean displayPopupT {get; set;}
@@ -29,6 +37,8 @@ public class AllDataController {
     
     //SCHOOL VARIABLES
     public School__c school {get; set;}
+    public School__c school2 {get; set;}
+    public List<School__c> searchSchoolList {get; set;}
     public String schoolIdUpdate {get; set;}
     public String schoolIdDelete {get; set;}
     public boolean displayPopupS {get; set;}
@@ -39,8 +49,22 @@ public class AllDataController {
         student = new Student__c();
         teacher = new Teacher__c();
         school = new School__c();
+        
+        student2 = new Student__c();
+        student3 = new Student__c();
+        teacher2 = new Teacher__c();
+        school2 = new School__c();
+        
+        showSave2 = true;
+        showSaveT2 = true;
+        showSaveS2 = true;
+
+        showSave = false;
+        showSaveT = false; 
+        showSaveS = false;
     }
     
+    //STUDENT
     //PAGINATION
     public PageReference next(){
         pageNumber++;
@@ -57,7 +81,6 @@ public class AllDataController {
         return null;
     }
     
-    //STUDENT
     //ADD
     public PageReference addNewStudent(){
         String id = student.School__c;       
@@ -101,20 +124,49 @@ public class AllDataController {
     }
     
     public void updateStudent(){
-        Student__c updateS = new Student__c(Id = idUpdateStudent);
+        Student__c updateS = Database.query('SELECT Id, Name, Active_Student__c, Last_Name__c, Birth_Born__c, Email__c FROM Student__c WHERE Id =: idUpdateStudent' );
 
-        updateS.Name = name;
-        updateS.Active_Student__c = activeStudent;
-        updateS.Last_Name__c = lastName;
-        updateS.Birth_Born__c = birthBorn;
-        updateS.Email__c = email;
+        student3.Id = updateS.Id;
+        student3.Name = updateS.Name;
+        student3.Last_Name__c = updateS.Last_Name__c;
+        student3.Birth_Born__c = updateS.Birth_Born__c;
+        student3.Active_Student__c = updateS.Active_Student__c;
+        student3.Email__c = updateS.Email__c;
 
-        //update updateS;
+        displayPopup = true;
     }
     
-    public List<Student__c> searchNameStudent(){
-        String query = baseQuery + ' WHERE Name LIKE '+ name +' LIMIT '+ pageSize;
-        return Database.query(query);
+    public void updateStudentButton(){
+
+        Student__c test = new Student__c();
+                
+        test.Id = student3.Id;
+        test.Name = student3.Name;
+        test.Last_Name__c = student3.Last_Name__c;
+        test.Birth_Born__c = student3.Birth_Born__c;
+        test.Active_Student__c = student3.Active_Student__c;
+        test.Email__c = student3.Email__c;
+        
+        upsert test;
+        
+        displayPopup = false;
+    }
+    
+    public void dataForNameSt(){
+        showSave = true;
+        showSave2 = false;
+        String search = (student2.Name).toLowerCase();
+        System.debug('search ' + search);
+        
+        if(!String.isEmpty(search)){
+            List<Student__c> lista = Database.query('SELECT Id, IdStudent__c, Full_Name_Student__c, Birth_Born__c, Email__c, School__r.Name, Teacher__r.Full_Name_Teacher__c FROM Student__c WHERE Name LIKE :search');
+            if(lista.size() <= 0){
+                ApexPages.addMessage(new ApexPages.Message(ApexPages.Severity.ERROR, 'There is not information'));
+            }
+            else{
+                searchList = lista;
+            }
+        }
     }
    
     //MODAL
@@ -187,6 +239,26 @@ public class AllDataController {
     public void updateRecordTeacher(){ //save-NO
         //Database.query('UPDATE Student__c SET Name: name');
     }
+
+    public void dataForNameTea(){
+        showSaveT = false;
+        showSaveT2 = true;
+        String search = teacher2.Name; 
+        
+        if(!String.isEmpty(search)){
+            List<Teacher__c> lista = Database.query('SELECT Id, Full_Name_Teacher__c, Email_Work__c, School_Work__r.Name, Number_Students__c FROM Teacher__c WHERE Name LIKE :search');
+            if(lista.size() <= 0){
+                ApexPages.addMessage(new ApexPages.Message(ApexPages.Severity.ERROR, 'There is not information'));
+            }
+            else{
+                searchTeacherList = lista;
+            }
+        }
+        else{
+            showSave = false;
+            showSave2 = true;
+        }
+    }
    
     //MODAL
     public void closePopupT() {        
@@ -247,6 +319,27 @@ public class AllDataController {
     
     public void updateRecordSchool(){ //save-NO
         //Database.query('UPDATE Student__c SET Name: name');
+    }
+
+    public void dataForNameSc(){
+        showSaveS = true;
+        showSaveS2 = false;
+
+        String search = school2.Name; 
+        
+        if(!String.isEmpty(search)){
+            List<School__c> lista = Database.query('SELECT Id, Code_School__c, Name, Phone_School__c, Number_Teachers__c, Number_Students__c, Restantes__c FROM School__c WHERE Name LIKE :search');
+            if(lista.size() <= 0){
+                ApexPages.addMessage(new ApexPages.Message(ApexPages.Severity.ERROR, 'There is not information'));
+            }
+            else{
+                searchSchoolList = lista;
+            }
+        }
+        else{
+            showSaveS = false;
+            showSaveS2 = true;
+        }
     }
    
     //MODAL
