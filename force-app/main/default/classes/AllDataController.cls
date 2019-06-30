@@ -13,16 +13,8 @@ public class AllDataController {
     public boolean displayPopup {get; set;}
     public Student__c student {get; set;}
     public Student__c student2 {get; set;}
-    public Student__c student3 {get; set;}
+    public Student__c studentEdit {get; set;}
     public List<Student__c> searchList {get; set;}
-    
-    public boolean showSave {get; set;}
-    public boolean showSaveT {get; set;}
-    public boolean showSaveS {get; set;}
-    
-    public boolean showSave2 {get; set;}
-    public boolean showSaveT2 {get; set;}
-    public boolean showSaveS2 {get; set;}
         
     //TEACHER VARIABLES
     public Teacher__c teacher {get; set;}
@@ -31,17 +23,16 @@ public class AllDataController {
     public List<Teacher__c> searchTeacherList {get; set;}
     public String idTeacherUpdate {get; set;}
     public String idTeacherDelete {get; set;}
-    public boolean displayPopupT {get; set;}
     
     private String baseQueryTeacher = 'SELECT Id, Full_Name_Teacher__c, Email_Work__c, School_Work__r.Name, Number_Students__c FROM Teacher__c';
     
     //SCHOOL VARIABLES
     public School__c school {get; set;}
     public School__c school2 {get; set;}
+    public School__c schoolEdit {get; set;}
     public List<School__c> searchSchoolList {get; set;}
     public String schoolIdUpdate {get; set;}
     public String schoolIdDelete {get; set;}
-    public boolean displayPopupS {get; set;}
     
     private String baseQuerySchool = 'SELECT Id, Code_School__c, Name, Phone_School__c, Number_Teachers__c, Number_Students__c, Restantes__c FROM School__c';
     
@@ -50,18 +41,13 @@ public class AllDataController {
         teacher = new Teacher__c();
         school = new School__c();
         
-        student2 = new Student__c();
-        student3 = new Student__c();
+        studentEdit = new Student__c();
         teacher2 = new Teacher__c();
         school2 = new School__c();
         
-        showSave2 = true;
-        showSaveT2 = true;
-        showSaveS2 = true;
-
-        showSave = false;
-        showSaveT = false; 
-        showSaveS = false;
+        student2 = new Student__c();
+        teacherEdit = new Teacher__c();
+        schoolEdit = new School__c();
     }
     
     //STUDENT
@@ -126,12 +112,12 @@ public class AllDataController {
     public void updateStudent(){
         Student__c updateS = Database.query('SELECT Id, Name, Active_Student__c, Last_Name__c, Birth_Born__c, Email__c FROM Student__c WHERE Id =: idUpdateStudent' );
 
-        student3.Id = updateS.Id;
-        student3.Name = updateS.Name;
-        student3.Last_Name__c = updateS.Last_Name__c;
-        student3.Birth_Born__c = updateS.Birth_Born__c;
-        student3.Active_Student__c = updateS.Active_Student__c;
-        student3.Email__c = updateS.Email__c;
+        studentEdit.Id = updateS.Id;
+        studentEdit.Name = updateS.Name;
+        studentEdit.Last_Name__c = updateS.Last_Name__c;
+        studentEdit.Birth_Born__c = updateS.Birth_Born__c;
+        studentEdit.Active_Student__c = updateS.Active_Student__c;
+        studentEdit.Email__c = updateS.Email__c;
 
         displayPopup = true;
     }
@@ -139,12 +125,12 @@ public class AllDataController {
     public void updateStudentButton(){
         Student__c myedit = new Student__c();
                 
-        myedit.Id = student3.Id;
-        myedit.Name = student3.Name;
-        myedit.Last_Name__c = student3.Last_Name__c;
-        myedit.Birth_Born__c = student3.Birth_Born__c;
-        myedit.Active_Student__c = student3.Active_Student__c;
-        myedit.Email__c = student3.Email__c;
+        myedit.Id = studentEdit.Id;
+        myedit.Name = studentEdit.Name;
+        myedit.Last_Name__c = studentEdit.Last_Name__c;
+        myedit.Birth_Born__c = studentEdit.Birth_Born__c;
+        myedit.Active_Student__c = studentEdit.Active_Student__c;
+        myedit.Email__c = studentEdit.Email__c;
         
         upsert myedit;
         
@@ -152,13 +138,11 @@ public class AllDataController {
     }
     
     public void dataForNameSt(){
-        showSave = true;
-        showSave2 = false;
         String search = (student2.Name).toLowerCase();
-        System.debug('search ' + search);
         
         if(!String.isEmpty(search)){
-            List<Student__c> lista = Database.query('SELECT Id, IdStudent__c, Full_Name_Student__c, Birth_Born__c, Email__c, School__r.Name, Teacher__r.Full_Name_Teacher__c FROM Student__c WHERE Name LIKE :search');
+            String newquery = 'SELECT Id, IdStudent__c, Full_Name_Student__c, Birth_Born__c, Email__c, School__r.Name, Teacher__r.Full_Name_Teacher__c FROM Student__c WHERE Name LIKE \''+ '%' + search + '%\'';
+            List<Student__c> lista = Database.query(newquery);
             if(lista.size() <= 0){
                 ApexPages.addMessage(new ApexPages.Message(ApexPages.Severity.ERROR, 'There is not information'));
             }
@@ -233,13 +217,12 @@ public class AllDataController {
     }
 
     public void updateTeacher(){
-        Teacher__c updateT = Database.query('SELECT Id, Name, Last_Name__c, School_Work__c, Email_Work__c FROM Teacher__c WHERE Id =: idTeacherUpdate' );
+        Teacher__c updateRecord = Database.query('SELECT Id, Name, Last_Name__c, Email_Work__c FROM Teacher__c WHERE Id =: idTeacherUpdate' );
 
-        teacherEdit.Id = updateT.Id;
-        teacherEdit.Name = updateT.Name;
-        teacherEdit.Last_Name__c = updateT.Last_Name__c;
-        teacherEdit.School_Work__c = updateT.School_Work__c;
-        teacherEdit.Email_Work__c = updateT.Email_Work__c;
+        teacherEdit.Id = updateRecord.Id;
+        teacherEdit.Name = updateRecord.Name;
+        teacherEdit.Last_Name__c = updateRecord.Last_Name__c;
+        teacherEdit.Email_Work__c = updateRecord.Email_Work__c;
 
         displayPopup = true;
     }
@@ -250,7 +233,6 @@ public class AllDataController {
         myedit.Id = teacherEdit.Id;
         myedit.Name = teacherEdit.Name;
         myedit.Last_Name__c = teacherEdit.Last_Name__c;
-        myedit.School_Work__c = teacherEdit.School_Work__c;
         myedit.Email_Work__c = teacherEdit.Email_Work__c;
         
         upsert myedit;
@@ -259,22 +241,17 @@ public class AllDataController {
     }
 
     public void dataForNameTea(){
-        showSaveT = false;
-        showSaveT2 = true;
-        String search = teacher2.Name; 
+        String search = (teacher2.Name).toLowerCase();
         
         if(!String.isEmpty(search)){
-            List<Teacher__c> lista = Database.query('SELECT Id, Full_Name_Teacher__c, Email_Work__c, School_Work__r.Name, Number_Students__c FROM Teacher__c WHERE Name LIKE :search');
+            String newquery = 'SELECT Id, Full_Name_Teacher__c, Email_Work__c, School_Work__r.Name, Number_Students__c FROM Teacher__c WHERE Name LIKE \''+ '%' + search + '%\'';
+            List<Teacher__c> lista = Database.query(newquery);
             if(lista.size() <= 0){
                 ApexPages.addMessage(new ApexPages.Message(ApexPages.Severity.ERROR, 'There is not information'));
             }
             else{
                 searchTeacherList = lista;
             }
-        }
-        else{
-            showSave = false;
-            showSave2 = true;
         }
     }
     
@@ -326,38 +303,41 @@ public class AllDataController {
         return Database.query('SELECT Id, Name, Phone_School__c FROM School__c WHERE Id =: schoolIdUpdate' );
     }
     
-    public void updateRecordSchool(){ //save-NO
-        //Database.query('UPDATE Student__c SET Name: name');
+    public void updateSchool(){
+        School__c updateS = Database.query('SELECT Id, Name, Phone_School__c FROM School__c WHERE Id =: schoolIdUpdate' );
+
+        schoolEdit.Id = updateS.Id;
+        schoolEdit.Name = updateS.Name;
+        schoolEdit.Phone_School__c = updateS.Phone_School__c;
+
+        displayPopup = true;
+    }
+    
+    public void updateSchoolButton(){
+        School__c myedit = new School__c();
+                
+        myedit.Id = schoolEdit.Id;
+        myedit.Name = schoolEdit.Name;
+        myedit.Phone_School__c = schoolEdit.Phone_School__c;
+        
+        upsert myedit;
+        
+        displayPopup = false;
     }
 
     public void dataForNameSc(){
-        showSaveS = true;
-        showSaveS2 = false;
-
-        String search = school2.Name; 
+        String search = (school2.Name).toLowerCase(); 
         
         if(!String.isEmpty(search)){
-            List<School__c> lista = Database.query('SELECT Id, Code_School__c, Name, Phone_School__c, Number_Teachers__c, Number_Students__c, Restantes__c FROM School__c WHERE Name LIKE :search');
-            if(lista.size() <= 0){
+            String newquery = 'SELECT Id, Code_School__c, Name, Phone_School__c, Number_Teachers__c, Number_Students__c, Restantes__c FROM School__c WHERE Name LIKE \''+ '%' + search + '%\'';
+            List<School__c> schoolList = Database.query(newquery);
+            if(schoolList.size() <= 0){
                 ApexPages.addMessage(new ApexPages.Message(ApexPages.Severity.ERROR, 'There is not information'));
             }
             else{
-                searchSchoolList = lista;
+                searchSchoolList = schoolList;
             }
         }
-        else{
-            showSaveS = false;
-            showSaveS2 = true;
-        }
-    }
-   
-    //MODAL
-    public void closePopupS() {        
-        displayPopupS = false;    
-    }  
-    
-    public void showPopupS() {        
-        displayPopupS = true;
     }
     
 }
